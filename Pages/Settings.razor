@@ -1,0 +1,72 @@
+﻿@page "/Configuracao"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<div class="text-center">
+    <div class="row text-center">
+        <div class="col-12 text-center">
+            <div class="row">
+                <div class="col-8 offset-2 box-pomodoro">
+
+                    <div class="container contact-form">
+                        <div class="contact-image">
+
+                        </div>
+                        <EditForm Model="@_pomodoroSettings" OnValidSubmit="FormSubmit">
+                            <h3>Comfiguração</h3>
+                            <div class="text-center">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            Duração Pomodoro 
+                                            <InputNumber @bind-Value="_pomodoroSettings.PomodoroDuration" />
+                                        </div>
+                                        <div class="form-group">
+                                            Pausa Curta
+                                            <InputNumber @bind-Value="_pomodoroSettings.PausaCurta" />
+                                        </div>
+                                        <div class="form-group">
+                                            Pausa Longa 
+                                            <InputNumber @bind-Value="_pomodoroSettings.PausaLonga" />
+                                        </div>
+
+                                        <DataAnnotationsValidator />
+                                        <ValidationSummary />
+                                        <div class="form-group">
+                                            <button class="success radius large button" value="" @onclick="FormSubmit">Comfirma</button>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private PomodoroConfig _pomodoroSettings = new PomodoroConfig();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var json = await localStorage.GetItemAsync<string>("pomodoroSettings");
+
+        if (json != null)
+        {
+            _pomodoroSettings = System.Text.Json.JsonSerializer.Deserialize<PomodoroConfig>(json);
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task FormSubmit()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(_pomodoroSettings);
+        await localStorage.SetItemAsync("pomodoroSettings", json);
+    }
+}
